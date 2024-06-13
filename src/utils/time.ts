@@ -8,7 +8,7 @@ export function getTimeDate(hours: number, minutes: number) {
 }
 
 export function formatTime(date: Date) {
-  return date.toLocaleTimeString(undefined, {
+  return date.toLocaleTimeString("nb-NO", {
     hour: "2-digit",
     minute: "2-digit",
   })

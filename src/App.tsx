@@ -56,9 +56,9 @@ export function App() {
     setWeapon(weapon)
 
     setCountdown(4)
-    setTimeout(() => setCountdown(3), 100)
-    setTimeout(() => setCountdown(2), 500)
-    setTimeout(() => setCountdown(1), 1000)
+    setTimeout(() => setCountdown(3), 500)
+    setTimeout(() => setCountdown(2), 1000)
+    setTimeout(() => setCountdown(1), 1500)
     setTimeout(() => {
       setTime(getTimeDate(0, 0))
       setTargetTime(
@@ -88,7 +88,7 @@ export function App() {
           element.innerText = `${secondsElapsed}s ${String(millisecondsElapsed).padStart(3, "0")}ms`
         }
       }, 1000 / 15)
-    }, 1500)
+    }, 2000)
   }, [])
 
   const [time, setTime] = useState(getTimeDate(0, 0))
@@ -173,7 +173,14 @@ export function App() {
           </div>
         ) : !targetTime ? (
           <div className="mt-8 flex flex-col items-center justify-center">
-            <div className="text-[200px] font-semibold">{countdown}</div>
+            <div
+              className={cx(
+                "text-[200px] font-semibold",
+                countdown === 4 && "opacity-0",
+              )}
+            >
+              {countdown}
+            </div>
             <img
               src="/timean.png"
               className="w-32 translate-x-0 object-contain transition-all"
