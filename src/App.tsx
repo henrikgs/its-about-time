@@ -40,6 +40,9 @@ function uploadOldTimes() {
   oldTimes.forEach((time) => {
     saveToLeaderboard(time)
   })
+
+  localStorage.removeItem("times2")
+  localStorage.removeItem("times")
 }
 
 uploadOldTimes()
