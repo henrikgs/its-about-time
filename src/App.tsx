@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react"
+import { Fragment, useCallback, useRef, useState } from "react"
 import { Content } from "./components/Content"
 import { DropdownTimeInput } from "./components/DropdownTimeInput"
 import { HPTimeInput } from "./components/HPTimeInput"
@@ -7,30 +7,27 @@ import { NativeTimeInput } from "./components/NativeTimeInput"
 import { cx } from "./utils/cx"
 import { formatTime, getTimeDate } from "./utils/time"
 
-const saveTimeToLocalStorage = (item: {
+type LeaderboardItem = {
   elapsedMilliseconds: number
   weapon: "native" | "hp" | "dropdown"
-}) => {
-  const times = JSON.parse(localStorage.getItem("times") || "[]")
-  times.push(item)
-  localStorage.setItem("times", JSON.stringify(times))
+  targetTime: string
 }
 
-const getTimesFromLocalStorage = (): {
-  elapsedMilliseconds: number
-  weapon: "native" | "hp" | "dropdown"
-}[] => {
+const saveTimeToLocalStorage = (item: LeaderboardItem) => {
+  const times = JSON.parse(localStorage.getItem("times2") || "[]")
+  times.push(item)
+  localStorage.setItem("times2", JSON.stringify(times))
+}
+
+const getTimesFromLocalStorage = (): LeaderboardItem[] => {
   try {
-    return JSON.parse(localStorage.getItem("times") || "[]")
+    return JSON.parse(localStorage.getItem("times2") || "[]")
   } catch {
     return []
   }
 }
 
-const sortedTimes = (): {
-  elapsedMilliseconds: number
-  weapon: "native" | "hp" | "dropdown"
-}[] => {
+const sortedTimes = (): LeaderboardItem[] => {
   return getTimesFromLocalStorage().sort(
     (a, b) => a.elapsedMilliseconds - b.elapsedMilliseconds,
   )
@@ -59,8 +56,8 @@ export function App() {
     setWeapon(weapon)
 
     setCountdown(3)
-    setTimeout(() => setCountdown(2), 1000)
-    setTimeout(() => setCountdown(1), 2000)
+    setTimeout(() => setCountdown(2), 500)
+    setTimeout(() => setCountdown(1), 1000)
     setTimeout(() => {
       setTime(getTimeDate(0, 0))
       setTargetTime(
@@ -90,7 +87,7 @@ export function App() {
           element.innerText = `${secondsElapsed}s ${String(millisecondsElapsed).padStart(3, "0")}ms`
         }
       }, 1000 / 15)
-    }, 3000)
+    }, 1500)
   }, [])
 
   const [time, setTime] = useState(getTimeDate(0, 0))
@@ -136,29 +133,42 @@ export function App() {
                   Dropdown
                 </button>
               </div>
+              <button
+                className="underline"
+                onClick={() => {
+                  const weapons = ["native", "hp", "dropdown"] as const
+                  startGame(weapons[Math.floor(Math.random() * weapons.length)])
+                }}
+              >
+                Give me a random weapon
+              </button>
             </div>
 
             <div className="rounded bg-white/[0.4] px-4 py-2">
-              <div>Times</div>
+              <div className="mb-2 text-lg font-bold">Times</div>
 
-              {times.map((item, i) => {
-                return (
-                  <div key={i}>
-                    <span className="font-bold">{i + 1}. </span>
-                    <span className="font-mono font-medium">
-                      {formatElapsedMilliseconds(item.elapsedMilliseconds)}
-                    </span>
-                    <span> ({item.weapon})</span>
-                  </div>
-                )
-              })}
+              <div className="grid grid-cols-3">
+                <div className="font-semibold">Weapon</div>
+                <div className="font-semibold">Target</div>
+                <div className="font-semibold">Score</div>
+
+                {times.map((item, i) => {
+                  return (
+                    <Fragment key={i}>
+                      <div>{item.weapon}</div>
+                      <div>{item.targetTime}</div>
+                      <div className="font-mono font-medium">
+                        {formatElapsedMilliseconds(item.elapsedMilliseconds)}
+                      </div>
+                    </Fragment>
+                  )
+                })}
+              </div>
             </div>
           </div>
         ) : !targetTime ? (
           <div className="mt-8 flex justify-center">
-            <div className="animate-bounce text-[200px] font-semibold">
-              {countdown}
-            </div>
+            <div className="text-[200px] font-semibold">{countdown}</div>
           </div>
         ) : startTime && endTime ? (
           <div className="mt-8 text-center">
@@ -201,7 +211,7 @@ export function App() {
             </div>
           </div>
         ) : (
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
             <div className="text-center text-lg">
               Target time is:{" "}
               <span className="font-semibold underline">
@@ -219,7 +229,7 @@ export function App() {
 
             <button
               className={cx(
-                "mt-4 rounded bg-[rgb(76,35,29)] p-2 text-xl font-semibold text-white",
+                "mt-2 rounded bg-[rgb(76,35,29)] p-2 text-xl font-semibold text-white",
                 !correctTargetTime && "cursor-not-allowed opacity-20",
               )}
               disabled={!correctTargetTime}
@@ -239,6 +249,7 @@ export function App() {
                       elapsedMilliseconds:
                         localEndTime.getTime() - startTime.getTime(),
                       weapon,
+                      targetTime: formatTime(targetTime),
                     })
                   }
                 }

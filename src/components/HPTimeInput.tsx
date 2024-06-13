@@ -153,14 +153,6 @@ export const HPTimeInput = ({
           </div>
         </div>
       </div>
-
-      <a
-        href="https://www.google.com/search?q=helseplattformen+klokke"
-        target="_blank"
-        className="mt-2 inline-block text-sm underline"
-      >
-        What is this input??!
-      </a>
     </div>
   )
 }
