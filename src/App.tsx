@@ -44,7 +44,7 @@ export function App() {
     null,
   )
   const [targetTime, setTargetTime] = useState<Date | null>(null)
-  const [countdown, setCountdown] = useState(3)
+  const [countdown, setCountdown] = useState(4)
 
   const [startTime, setStartTime] = useState<Date | null>(null)
   const [endTime, setEndTime] = useState<Date | null>(null)
@@ -55,7 +55,8 @@ export function App() {
   const startGame = useCallback((weapon: "native" | "hp" | "dropdown") => {
     setWeapon(weapon)
 
-    setCountdown(3)
+    setCountdown(4)
+    setTimeout(() => setCountdown(3), 100)
     setTimeout(() => setCountdown(2), 500)
     setTimeout(() => setCountdown(1), 1000)
     setTimeout(() => {
@@ -165,10 +166,24 @@ export function App() {
                 })}
               </div>
             </div>
+
+            <div>
+              <img src="/timean-bg.webp" className="w-full rounded-3xl" />
+            </div>
           </div>
         ) : !targetTime ? (
-          <div className="mt-8 flex justify-center">
+          <div className="mt-8 flex flex-col items-center justify-center">
             <div className="text-[200px] font-semibold">{countdown}</div>
+            <img
+              src="/timean.png"
+              className="w-32 translate-x-0 object-contain transition-all"
+              style={{
+                transform: `
+                  translateX(${countdown === 4 ? 0 : countdown === 3 ? -100 : countdown === 2 ? 100 : countdown === 1 ? 0 : -100}px)
+                  rotate(${countdown === 4 ? 0 : countdown === 3 ? -20 : countdown === 2 ? 20 : countdown === 1 ? 0 : -20}deg)
+                  `,
+              }}
+            />
           </div>
         ) : startTime && endTime ? (
           <div className="mt-8 text-center">

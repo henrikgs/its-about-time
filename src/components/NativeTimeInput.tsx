@@ -22,6 +22,7 @@ export const NativeTimeInput = ({
           const eventKeyIsNumber = !isNaN(parseInt(event.key))
           if (eventKeyIsNumber) {
             event.preventDefault()
+            alert("No cheating!!!")
           }
         }}
       />
