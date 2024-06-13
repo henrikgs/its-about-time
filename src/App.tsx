@@ -184,15 +184,20 @@ export function App() {
                 <div className="font-semibold">Name</div>
                 <div className="font-semibold">Weapon</div>
                 <div className="font-semibold">Target</div>
-                <div className="font-semibold">Score</div>
+                <div className="text-right font-semibold">Score</div>
 
                 {leaderboard.map((item, i) => {
                   return (
                     <Fragment key={i}>
-                      <div>{item.username || "unknown cowboy"}</div>
+                      <div>
+                        {i === 0 && <span>🏆 </span>}
+                        {i === 1 && <span>🥈 </span>}
+                        {i === 2 && <span>🥉 </span>}
+                        {item.username || "unknown cowboy"}
+                      </div>
                       <div>{item.weapon}</div>
                       <div>{item.targetTime}</div>
-                      <div className="font-mono font-medium">
+                      <div className="text-right font-mono font-medium">
                         {formatElapsedMilliseconds(item.elapsedMilliseconds)}
                       </div>
                     </Fragment>
