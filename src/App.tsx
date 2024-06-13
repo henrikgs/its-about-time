@@ -189,7 +189,7 @@ export function App() {
                 {leaderboard.map((item, i) => {
                   return (
                     <Fragment key={i}>
-                      <div>{item.username}</div>
+                      <div>{item.username || "unknown cowboy"}</div>
                       <div>{item.weapon}</div>
                       <div>{item.targetTime}</div>
                       <div className="font-mono font-medium">
