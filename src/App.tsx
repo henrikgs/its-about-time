@@ -114,6 +114,8 @@ export function App() {
   )
 
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([])
+  const sliceIncrement = 100
+  const [slice, setSlice] = useState(sliceIncrement)
   useEffect(() => {
     getLeaderboard().then(setLeaderboard)
   }, [])
@@ -178,7 +180,9 @@ export function App() {
             </div>
 
             <div className="rounded bg-white/[0.4] px-4 py-2">
-              <div className="mb-2 text-lg font-bold">Times</div>
+              <div className="mb-2 text-center text-lg font-bold underline">
+                Leaderboard ({leaderboard.length} entries)
+              </div>
 
               <div className="grid grid-cols-4">
                 <div className="font-semibold">Name</div>
@@ -186,14 +190,14 @@ export function App() {
                 <div className="font-semibold">Target</div>
                 <div className="text-right font-semibold">Score</div>
 
-                {leaderboard.map((item, i) => {
+                {leaderboard.slice(0, slice).map((item, i) => {
                   return (
                     <Fragment key={i}>
                       <div>
                         {i === 0 && <span>🏆 </span>}
                         {i === 1 && <span>🥈 </span>}
                         {i === 2 && <span>🥉 </span>}
-                        {item.username || "unknown cowboy"}
+                        {(item.username || "unknown cowboy").slice(0, 20)}
                       </div>
                       <div>{item.weapon}</div>
                       <div>{item.targetTime}</div>
@@ -204,6 +208,17 @@ export function App() {
                   )
                 })}
               </div>
+
+              {leaderboard.length > slice && (
+                <div className="mt-2 text-center">
+                  <button
+                    onClick={() => setSlice((slice) => slice + sliceIncrement)}
+                    className="rounded bg-white px-3 py-1"
+                  >
+                    Load more
+                  </button>
+                </div>
+              )}
             </div>
 
             <div>

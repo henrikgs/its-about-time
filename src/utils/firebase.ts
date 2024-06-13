@@ -43,9 +43,9 @@ export async function getLeaderboard(): Promise<LeaderboardEntry[]> {
       leaderboard.push(doc.data() as LeaderboardEntry)
     })
 
-    return leaderboard
-      .sort((a, b) => a.elapsedMilliseconds - b.elapsedMilliseconds)
-      .slice(0, 200)
+    return leaderboard.sort(
+      (a, b) => a.elapsedMilliseconds - b.elapsedMilliseconds,
+    )
   } catch (error) {
     console.error("Error getting documents", error)
   }
