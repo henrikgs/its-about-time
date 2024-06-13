@@ -181,13 +181,16 @@ export function App() {
 
             <div className="rounded bg-white/[0.4] px-4 py-2">
               <div className="mb-2 text-center">
-                <div className="text-lg font-bold underline">Leaderboard</div>
+                <div className="text-lg font-bold underline">
+                  Global leaderboard
+                </div>
                 <div>({leaderboard.length} entries)</div>
               </div>
 
               <table className="w-full">
                 <thead>
                   <tr>
+                    <th className="w-4 pr-2"></th>
                     <th className="text-left">Name</th>
                     <th className="text-left">Weapon</th>
                     <th className="text-left">Target</th>
@@ -199,6 +202,9 @@ export function App() {
                   {leaderboard.slice(0, slice).map((item, i) => {
                     return (
                       <tr key={i}>
+                        <td className="w-4 pr-2 text-right text-gray-500">
+                          {i + 1}.
+                        </td>
                         <td className="text-left">
                           {i === 0 && <span>🏆 </span>}
                           {i === 1 && <span>🥈 </span>}
@@ -233,7 +239,7 @@ export function App() {
             </div>
           </div>
         ) : !targetTime ? (
-          <div className="mt-8 flex flex-col items-center justify-center">
+          <div className="pointer-events-none mt-8 flex flex-col items-center justify-center">
             <div
               className={cx(
                 "text-[200px] font-semibold",
