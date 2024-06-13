@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { Content } from "./components/Content"
 import { DropdownTimeInput } from "./components/DropdownTimeInput"
 import { HPTimeInput } from "./components/HPTimeInput"
@@ -180,34 +180,41 @@ export function App() {
             </div>
 
             <div className="rounded bg-white/[0.4] px-4 py-2">
-              <div className="mb-2 text-center text-lg font-bold underline">
-                Leaderboard ({leaderboard.length} entries)
+              <div className="mb-2 text-center">
+                <div className="text-lg font-bold underline">Leaderboard</div>
+                <div>({leaderboard.length} entries)</div>
               </div>
 
-              <div className="grid grid-cols-4">
-                <div className="font-semibold">Name</div>
-                <div className="font-semibold">Weapon</div>
-                <div className="font-semibold">Target</div>
-                <div className="text-right font-semibold">Score</div>
+              <table className="w-full">
+                <thead>
+                  <tr>
+                    <th className="text-left">Name</th>
+                    <th className="text-left">Weapon</th>
+                    <th className="text-left">Target</th>
+                    <th className="text-right">Score</th>
+                  </tr>
+                </thead>
 
-                {leaderboard.slice(0, slice).map((item, i) => {
-                  return (
-                    <Fragment key={i}>
-                      <div>
-                        {i === 0 && <span>🏆 </span>}
-                        {i === 1 && <span>🥈 </span>}
-                        {i === 2 && <span>🥉 </span>}
-                        {(item.username || "unknown cowboy").slice(0, 20)}
-                      </div>
-                      <div>{item.weapon}</div>
-                      <div>{item.targetTime}</div>
-                      <div className="text-right font-mono font-medium">
-                        {formatElapsedMilliseconds(item.elapsedMilliseconds)}
-                      </div>
-                    </Fragment>
-                  )
-                })}
-              </div>
+                <tbody>
+                  {leaderboard.slice(0, slice).map((item, i) => {
+                    return (
+                      <tr key={i}>
+                        <td className="text-left">
+                          {i === 0 && <span>🏆 </span>}
+                          {i === 1 && <span>🥈 </span>}
+                          {i === 2 && <span>🥉 </span>}
+                          {(item.username || "unknown cowboy").slice(0, 20)}
+                        </td>
+                        <td className="text-left">{item.weapon}</td>
+                        <td className="text-left">{item.targetTime}</td>
+                        <td className="text-right font-mono font-medium">
+                          {formatElapsedMilliseconds(item.elapsedMilliseconds)}
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
 
               {leaderboard.length > slice && (
                 <div className="mt-2 text-center">
