@@ -73,6 +73,7 @@ export function App() {
     setTimeout(() => setCountdown(3), 500)
     setTimeout(() => setCountdown(2), 1000)
     setTimeout(() => setCountdown(1), 1500)
+    setTimeout(() => setCountdown(0), 2000)
     setTimeout(() => {
       setTime(getTimeDate(0, 0))
       setTargetTime(
@@ -102,7 +103,7 @@ export function App() {
           element.innerText = `${secondsElapsed}s ${String(millisecondsElapsed).padStart(3, "0")}ms`
         }
       }, 1000 / 15)
-    }, 2000)
+    }, 2500)
   }, [])
 
   const [time, setTime] = useState(getTimeDate(0, 0))
@@ -246,15 +247,20 @@ export function App() {
                 countdown === 4 && "opacity-0",
               )}
             >
-              {countdown}
+              {countdown === 0 ? "Go!" : countdown}
             </div>
             <img
               src="/timean.png"
-              className="w-32 translate-x-0 object-contain transition-all"
+              className={cx(
+                "w-32 origin-bottom translate-x-0 object-contain transition-all",
+                countdown === 0 && "origin-center",
+              )}
               style={{
                 transform: `
-                  translateX(${countdown === 4 ? 0 : countdown === 3 ? -100 : countdown === 2 ? 100 : countdown === 1 ? 0 : -100}px)
-                  rotate(${countdown === 4 ? 0 : countdown === 3 ? -20 : countdown === 2 ? 20 : countdown === 1 ? 0 : -20}deg)
+                  translateX(${countdown === 4 ? 0 : countdown === 3 ? -100 : countdown === 2 ? 100 : countdown === 1 ? 0 : 0}px)
+                  translateY(${countdown === 0 ? 200 : 0}px)
+                  rotate(${countdown === 4 ? 0 : countdown === 3 ? -15 : countdown === 2 ? 15 : countdown === 1 ? 0 : 0}deg)
+                  scale(${countdown === 0 ? 4 : 1})
                   `,
               }}
             />
@@ -308,13 +314,15 @@ export function App() {
               </span>
             </div>
 
-            {weapon === "native" ? (
-              <NativeTimeInput value={time} onValue={setTime} />
-            ) : weapon === "hp" ? (
-              <HPTimeInput value={time} onValue={setTime} />
-            ) : weapon === "dropdown" ? (
-              <DropdownTimeInput value={time} onValue={setTime} />
-            ) : null}
+            <div className="flex justify-center">
+              {weapon === "native" ? (
+                <NativeTimeInput value={time} onValue={setTime} />
+              ) : weapon === "hp" ? (
+                <HPTimeInput value={time} onValue={setTime} />
+              ) : weapon === "dropdown" ? (
+                <DropdownTimeInput value={time} onValue={setTime} />
+              ) : null}
+            </div>
 
             <button
               className={cx(
@@ -349,7 +357,7 @@ export function App() {
               Submit
             </button>
 
-            <div className="font-mono" id="time-elapsed" />
+            <div className="text-center font-mono" id="time-elapsed" />
           </div>
         )}
       </Content>
