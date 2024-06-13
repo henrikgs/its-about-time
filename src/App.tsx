@@ -1,22 +1,24 @@
-import { Fragment, useCallback, useRef, useState } from "react"
+import { Fragment, useCallback, useEffect, useRef, useState } from "react"
 import { Content } from "./components/Content"
 import { DropdownTimeInput } from "./components/DropdownTimeInput"
 import { HPTimeInput } from "./components/HPTimeInput"
 import { Layout } from "./components/Layout"
 import { NativeTimeInput } from "./components/NativeTimeInput"
 import { cx } from "./utils/cx"
+import {
+  LeaderboardEntry,
+  getLeaderboard,
+  storeLeaderboardEntry,
+} from "./utils/firebase"
 import { formatTime, getTimeDate } from "./utils/time"
 
-type LeaderboardItem = {
-  elapsedMilliseconds: number
-  weapon: "native" | "hp" | "dropdown"
-  targetTime: string
-}
+type LeaderboardItem = Omit<LeaderboardEntry, "username">
 
-const saveTimeToLocalStorage = (item: LeaderboardItem) => {
-  const times = JSON.parse(localStorage.getItem("times2") || "[]")
-  times.push(item)
-  localStorage.setItem("times2", JSON.stringify(times))
+const saveToLeaderboard = async (item: LeaderboardItem) => {
+  await storeLeaderboardEntry({
+    ...item,
+    username: localStorage.getItem("username") || "",
+  })
 }
 
 const getTimesFromLocalStorage = (): LeaderboardItem[] => {
@@ -27,11 +29,20 @@ const getTimesFromLocalStorage = (): LeaderboardItem[] => {
   }
 }
 
-const sortedTimes = (): LeaderboardItem[] => {
-  return getTimesFromLocalStorage().sort(
-    (a, b) => a.elapsedMilliseconds - b.elapsedMilliseconds,
-  )
+function uploadOldTimes() {
+  const oldTimes = getTimesFromLocalStorage()
+  const username = localStorage.getItem("username")
+
+  if (!username || oldTimes.length === 0) {
+    return
+  }
+
+  oldTimes.forEach((time) => {
+    saveToLeaderboard(time)
+  })
 }
+
+uploadOldTimes()
 
 const formatElapsedMilliseconds = (elapsedMilliseconds: number) => {
   const seconds = Math.floor(elapsedMilliseconds / 1000)
@@ -99,7 +110,13 @@ export function App() {
       time.getMinutes() === targetTime.getMinutes(),
   )
 
-  const times = sortedTimes()
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([])
+  useEffect(() => {
+    getLeaderboard().then(setLeaderboard)
+  }, [])
+  const refreshLeaderboard = useCallback(() => {
+    getLeaderboard().then(setLeaderboard)
+  }, [])
 
   return (
     <Layout>
@@ -110,6 +127,18 @@ export function App() {
               <div className="text-center">
                 Your mission, should you choose to accept it, is to find the
                 best time picker.
+              </div>
+              <div>
+                <div>What's your name, cowboy?</div>
+                <input
+                  type="text"
+                  className="rounded px-2 py-1"
+                  placeholder="Enter your name"
+                  defaultValue={localStorage.getItem("username") || ""}
+                  onChange={(event) => {
+                    localStorage.setItem("username", event.target.value)
+                  }}
+                />
               </div>
               <div className="text-center text-xl">
                 Select your weapon to start the game
@@ -148,14 +177,16 @@ export function App() {
             <div className="rounded bg-white/[0.4] px-4 py-2">
               <div className="mb-2 text-lg font-bold">Times</div>
 
-              <div className="grid grid-cols-3">
+              <div className="grid grid-cols-4">
+                <div className="font-semibold">Name</div>
                 <div className="font-semibold">Weapon</div>
                 <div className="font-semibold">Target</div>
                 <div className="font-semibold">Score</div>
 
-                {times.map((item, i) => {
+                {leaderboard.map((item, i) => {
                   return (
                     <Fragment key={i}>
+                      <div>{item.username}</div>
                       <div>{item.weapon}</div>
                       <div>{item.targetTime}</div>
                       <div className="font-mono font-medium">
@@ -267,11 +298,13 @@ export function App() {
                   setEndTime(localEndTime)
 
                   if (startTime) {
-                    saveTimeToLocalStorage({
+                    saveToLeaderboard({
                       elapsedMilliseconds:
                         localEndTime.getTime() - startTime.getTime(),
                       weapon,
                       targetTime: formatTime(targetTime),
+                    }).then(() => {
+                      refreshLeaderboard()
                     })
                   }
                 }
