@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { uniqBy } from "../utils/array"
 import { cx } from "../utils/cx"
+import { calculateClicks } from "../utils/scores"
 import { LeaderboardEntry } from "../utils/supabase"
 import { formatElapsedMilliseconds } from "../utils/time"
 
@@ -22,7 +23,7 @@ export const Leaderboard = ({
 
       <div className="mb-4 flex flex-wrap gap-2">
         <LeaderboardButton
-          label="Global"
+          label="Global all time"
           onClick={() => setSelectedType("global")}
           selected={selectedType === "global"}
         />
@@ -114,7 +115,12 @@ const LeaderboardTable = ({
                 {(item.username || "unknown cowboy").slice(0, 16)}
               </td>
               <td className="text-left">{item.weapon}</td>
-              <td className="text-left">{item.targetTime}</td>
+              <td className="text-left">
+                <div>{item.targetTime}</div>
+                {item.weapon === "hp" && (
+                  <div>({calculateClicks(item.targetTime)}&nbsp;click)</div>
+                )}
+              </td>
               <td className="text-right font-mono font-medium">
                 {formatElapsedMilliseconds(item.elapsedMilliseconds)}
               </td>
@@ -255,7 +261,12 @@ const MostPlayedByUsername = ({
                   {(item.username || "unknown cowboy").slice(0, 16)}
                 </td>
                 <td className="text-left">{item.best.weapon}</td>
-                <td className="text-left">{item.best.targetTime}</td>
+                <div>{item.best.targetTime}</div>
+                {item.best.weapon === "hp" && (
+                  <div>
+                    ({calculateClicks(item.best.targetTime)}&nbsp;click)
+                  </div>
+                )}
                 <td className="text-right font-mono font-medium">
                   {formatElapsedMilliseconds(item.best.elapsedMilliseconds)}
                 </td>
