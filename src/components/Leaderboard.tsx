@@ -116,10 +116,10 @@ const LeaderboardTable = ({
               </td>
               <td className="text-left">{item.weapon}</td>
               <td className="text-left">
-                <div>{item.targetTime}</div>
-                {item.weapon === "hp" && (
-                  <div>({calculateClicks(item.targetTime)}&nbsp;click)</div>
-                )}
+                {item.targetTime}
+                {item.weapon === "hp"
+                  ? ` (${calculateClicks(item.targetTime)})`
+                  : ""}
               </td>
               <td className="text-right font-mono font-medium">
                 {formatElapsedMilliseconds(item.elapsedMilliseconds)}
@@ -261,12 +261,12 @@ const MostPlayedByUsername = ({
                   {(item.username || "unknown cowboy").slice(0, 16)}
                 </td>
                 <td className="text-left">{item.best.weapon}</td>
-                <div>{item.best.targetTime}</div>
-                {item.best.weapon === "hp" && (
-                  <div>
-                    ({calculateClicks(item.best.targetTime)}&nbsp;click)
-                  </div>
-                )}
+                <td className="text-left">
+                  {item.best.targetTime}
+                  {item.best.weapon === "hp"
+                    ? ` (${calculateClicks(item.best.targetTime)})`
+                    : ""}
+                </td>
                 <td className="text-right font-mono font-medium">
                   {formatElapsedMilliseconds(item.best.elapsedMilliseconds)}
                 </td>
