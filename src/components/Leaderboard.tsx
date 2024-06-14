@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { uniqBy } from "../utils/array"
 import { cx } from "../utils/cx"
 import { LeaderboardEntry } from "../utils/supabase"
 import { formatElapsedMilliseconds } from "../utils/time"
@@ -8,9 +9,9 @@ export const Leaderboard = ({
 }: {
   leaderboardEntries: LeaderboardEntry[]
 }) => {
-  const [selectedType, setSelectedType] = useState<"global" | "global-today">(
-    "global",
-  )
+  const [selectedType, setSelectedType] = useState<
+    "global" | "global-today" | "today-best-only"
+  >("global")
 
   return (
     <div className="rounded bg-white/[0.4] px-4 py-2">
@@ -30,12 +31,19 @@ export const Leaderboard = ({
           onClick={() => setSelectedType("global-today")}
           selected={selectedType === "global-today"}
         />
+        <LeaderboardButton
+          label="Today best only"
+          onClick={() => setSelectedType("today-best-only")}
+          selected={selectedType === "today-best-only"}
+        />
       </div>
 
       {selectedType === "global" ? (
         <GlobalLeaderboard leaderboardEntries={leaderboardEntries} />
       ) : selectedType === "global-today" ? (
         <GlobalToday leaderboardEntries={leaderboardEntries} />
+      ) : selectedType === "today-best-only" ? (
+        <TodayBestOnly leaderboardEntries={leaderboardEntries} />
       ) : null}
     </div>
   )
@@ -144,13 +152,6 @@ const GlobalToday = ({
 }: {
   leaderboardEntries: LeaderboardEntry[]
 }) => {
-  const isSameDate = (date1: Date, date2: Date) => {
-    return (
-      date1.getDate() === date2.getDate() &&
-      date1.getMonth() === date2.getMonth() &&
-      date1.getFullYear() === date2.getFullYear()
-    )
-  }
   const entriesToday = leaderboardEntries.filter((entry) => {
     return isSameDate(new Date(entry.createdAt), new Date())
   })
@@ -159,5 +160,32 @@ const GlobalToday = ({
     <div>
       <LeaderboardTable leaderboardEntries={entriesToday} />
     </div>
+  )
+}
+
+const TodayBestOnly = ({
+  leaderboardEntries,
+}: {
+  leaderboardEntries: LeaderboardEntry[]
+}) => {
+  const entries = uniqBy(
+    leaderboardEntries.filter((entry) => {
+      return isSameDate(new Date(entry.createdAt), new Date())
+    }),
+    (item) => item.username,
+  )
+
+  return (
+    <div>
+      <LeaderboardTable leaderboardEntries={entries} />
+    </div>
+  )
+}
+
+const isSameDate = (date1: Date, date2: Date) => {
+  return (
+    date1.getDate() === date2.getDate() &&
+    date1.getMonth() === date2.getMonth() &&
+    date1.getFullYear() === date2.getFullYear()
   )
 }
