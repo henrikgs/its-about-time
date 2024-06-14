@@ -11,8 +11,12 @@ export const Leaderboard = ({
   leaderboardEntries: LeaderboardEntry[]
 }) => {
   const [selectedType, setSelectedType] = useState<
-    "global" | "global-today" | "today-best-only" | "most-played"
-  >("global")
+    | "global"
+    | "global-today"
+    | "today-best-only"
+    | "most-played"
+    | "daily-challenge"
+  >("today-best-only")
 
   return (
     <div className="rounded bg-white/[0.4] px-4 py-2">
@@ -22,6 +26,11 @@ export const Leaderboard = ({
       </div>
 
       <div className="mb-4 flex flex-wrap gap-2">
+        <LeaderboardButton
+          label="Daily leaderboard"
+          onClick={() => setSelectedType("today-best-only")}
+          selected={selectedType === "today-best-only"}
+        />
         <LeaderboardButton
           label="Global all time"
           onClick={() => setSelectedType("global")}
@@ -33,14 +42,14 @@ export const Leaderboard = ({
           selected={selectedType === "global-today"}
         />
         <LeaderboardButton
-          label="Today best only"
-          onClick={() => setSelectedType("today-best-only")}
-          selected={selectedType === "today-best-only"}
-        />
-        <LeaderboardButton
           label="Most played"
           onClick={() => setSelectedType("most-played")}
           selected={selectedType === "most-played"}
+        />
+        <LeaderboardButton
+          label="Daily challenge"
+          onClick={() => setSelectedType("daily-challenge")}
+          selected={selectedType === "daily-challenge"}
         />
       </div>
 
@@ -52,6 +61,8 @@ export const Leaderboard = ({
         <TodayBestOnly leaderboardEntries={leaderboardEntries} />
       ) : selectedType === "most-played" ? (
         <MostPlayedByUsername leaderboardEntries={leaderboardEntries} />
+      ) : selectedType === "daily-challenge" ? (
+        <DailyChallenge leaderboardEntries={leaderboardEntries} />
       ) : null}
     </div>
   )
@@ -276,6 +287,62 @@ const MostPlayedByUsername = ({
           })}
         </tbody>
       </table>
+    </div>
+  )
+}
+
+const dailyChallenges = [
+  {
+    maxElapsedMilliseconds: 5000,
+    weapon: "native",
+  },
+  {
+    maxElapsedMilliseconds: 2500,
+    weapon: "hp",
+  },
+  {
+    maxElapsedMilliseconds: 3500,
+    weapon: "dropdown",
+  },
+]
+
+const DailyChallenge = ({
+  leaderboardEntries,
+}: {
+  leaderboardEntries: LeaderboardEntry[]
+}) => {
+  const todaysChallenges =
+    dailyChallenges[new Date().getDay() % dailyChallenges.length]
+
+  const entriesToday = leaderboardEntries
+    .filter((entry) => {
+      return isSameDate(new Date(entry.createdAt), new Date())
+    })
+    .filter((entry) => {
+      return (
+        entry.weapon === todaysChallenges.weapon &&
+        entry.elapsedMilliseconds < todaysChallenges.maxElapsedMilliseconds
+      )
+    })
+
+  return (
+    <div>
+      <div>
+        <div className="text-lg font-bold underline">Daily challenge</div>
+        <div className="mb-4">
+          Weapon: {todaysChallenges.weapon} - Get under{" "}
+          {formatElapsedMilliseconds(todaysChallenges.maxElapsedMilliseconds)}
+        </div>
+      </div>
+      <LeaderboardTable leaderboardEntries={entriesToday} />
+
+      {entriesToday.length === 0 && (
+        <div className="mt-6 text-center text-lg">
+          No entries yet.
+          <br />
+          Be the first to complete the daily challenge!
+        </div>
+      )}
     </div>
   )
 }
