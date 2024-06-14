@@ -13,3 +13,9 @@ export function formatTime(date: Date) {
     minute: "2-digit",
   })
 }
+
+export function formatElapsedMilliseconds(elapsedMilliseconds: number) {
+  const seconds = Math.floor(elapsedMilliseconds / 1000)
+  const milliseconds = elapsedMilliseconds % 1000
+  return `${seconds}.${String(milliseconds).padStart(3, "0")}s`
+}

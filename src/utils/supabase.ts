@@ -6,13 +6,17 @@ const supabase = createClient(
 )
 
 export type LeaderboardEntry = {
+  id: string
+  createdAt: string
   elapsedMilliseconds: number
   weapon: "native" | "hp" | "dropdown"
   targetTime: string
   username: string
 }
 
-export async function storeLeaderboardEntry(entry: LeaderboardEntry) {
+export async function storeLeaderboardEntry(
+  entry: Omit<LeaderboardEntry, "id" | "createdAt">,
+) {
   await supabase.from("leaderboard").insert({
     elapsed_milliseconds: entry.elapsedMilliseconds,
     weapon: entry.weapon,
@@ -32,6 +36,8 @@ export async function getLeaderboard(): Promise<LeaderboardEntry[]> {
   return data
     .map((doc) => {
       return {
+        id: doc.id,
+        createdAt: doc.created_at,
         elapsedMilliseconds: doc.elapsed_milliseconds,
         weapon: doc.weapon,
         targetTime: doc.target_time,

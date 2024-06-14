@@ -3,6 +3,7 @@ import { Content } from "./components/Content"
 import { DropdownTimeInput } from "./components/DropdownTimeInput"
 import { HPTimeInput } from "./components/HPTimeInput"
 import { Layout } from "./components/Layout"
+import { Leaderboard } from "./components/Leaderboard"
 import { NativeTimeInput } from "./components/NativeTimeInput"
 import { cx } from "./utils/cx"
 import {
@@ -11,47 +12,6 @@ import {
   storeLeaderboardEntry,
 } from "./utils/supabase"
 import { formatTime, getTimeDate } from "./utils/time"
-
-type LeaderboardItem = Omit<LeaderboardEntry, "username">
-
-const saveToLeaderboard = async (item: LeaderboardItem) => {
-  await storeLeaderboardEntry({
-    ...item,
-    username: localStorage.getItem("username") || "",
-  })
-}
-
-const getTimesFromLocalStorage = (): LeaderboardItem[] => {
-  try {
-    return JSON.parse(localStorage.getItem("times2") || "[]")
-  } catch {
-    return []
-  }
-}
-
-function uploadOldTimes() {
-  const oldTimes = getTimesFromLocalStorage()
-  const username = localStorage.getItem("username")
-
-  if (!username || oldTimes.length === 0) {
-    return
-  }
-
-  oldTimes.forEach((time) => {
-    saveToLeaderboard(time)
-  })
-
-  localStorage.removeItem("times2")
-  localStorage.removeItem("times")
-}
-
-uploadOldTimes()
-
-const formatElapsedMilliseconds = (elapsedMilliseconds: number) => {
-  const seconds = Math.floor(elapsedMilliseconds / 1000)
-  const milliseconds = elapsedMilliseconds % 1000
-  return `${seconds}.${String(milliseconds).padStart(3, "0")}s`
-}
 
 export function App() {
   const [weapon, setWeapon] = useState<"native" | "hp" | "dropdown" | null>(
@@ -115,8 +75,6 @@ export function App() {
   )
 
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([])
-  const sliceIncrement = 100
-  const [slice, setSlice] = useState(sliceIncrement)
   useEffect(() => {
     getLeaderboard().then(setLeaderboard)
   }, [])
@@ -180,69 +138,7 @@ export function App() {
               </button>
             </div>
 
-            <div className="rounded bg-white/[0.4] px-4 py-2">
-              <div className="mb-2 text-center">
-                <div className="text-lg font-bold underline">
-                  Global leaderboard
-                </div>
-                <div>({leaderboard.length} entries)</div>
-                <div>
-                  Yay!🎉 The leaderboard is now up and running again.. Happy
-                  gaming!!
-                </div>
-              </div>
-
-              <table className="w-full">
-                <thead>
-                  <tr>
-                    <th className="w-4 pr-2"></th>
-                    <th className="text-left">Name</th>
-                    <th className="text-left">Weapon</th>
-                    <th className="text-left">Target</th>
-                    <th className="text-right">Score</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {leaderboard.slice(0, slice).map((item, i) => {
-                    return (
-                      <tr key={i}>
-                        <td className="w-4 pr-2 text-right text-gray-500">
-                          {i === 0 ? (
-                            <span>🏆</span>
-                          ) : i === 1 ? (
-                            <span>🥈</span>
-                          ) : i === 2 ? (
-                            <span>🥉 </span>
-                          ) : (
-                            <span>{i + 1}.</span>
-                          )}
-                        </td>
-                        <td className="break-all text-left">
-                          {(item.username || "unknown cowboy").slice(0, 16)}
-                        </td>
-                        <td className="text-left">{item.weapon}</td>
-                        <td className="text-left">{item.targetTime}</td>
-                        <td className="text-right font-mono font-medium">
-                          {formatElapsedMilliseconds(item.elapsedMilliseconds)}
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-
-              {leaderboard.length > slice && (
-                <div className="mt-2 text-center">
-                  <button
-                    onClick={() => setSlice((slice) => slice + sliceIncrement)}
-                    className="rounded bg-white px-3 py-1"
-                  >
-                    Load more
-                  </button>
-                </div>
-              )}
-            </div>
+            <Leaderboard leaderboardEntries={leaderboard} />
 
             <div>
               <img src="/timean-bg.webp" className="w-full rounded-3xl" />
@@ -351,11 +247,12 @@ export function App() {
                   setEndTime(localEndTime)
 
                   if (startTime) {
-                    saveToLeaderboard({
+                    storeLeaderboardEntry({
                       elapsedMilliseconds:
                         localEndTime.getTime() - startTime.getTime(),
                       weapon,
                       targetTime: formatTime(targetTime),
+                      username: localStorage.getItem("username") || "",
                     }).then(() => {
                       refreshLeaderboard()
                     })
