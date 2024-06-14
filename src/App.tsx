@@ -204,13 +204,18 @@ export function App() {
                     return (
                       <tr key={i}>
                         <td className="w-4 pr-2 text-right text-gray-500">
-                          {i + 1}.
+                          {i === 0 ? (
+                            <span>🏆</span>
+                          ) : i === 1 ? (
+                            <span>🥈</span>
+                          ) : i === 2 ? (
+                            <span>🥉 </span>
+                          ) : (
+                            <span>{i + 1}.</span>
+                          )}
                         </td>
-                        <td className="text-left">
-                          {i === 0 && <span>🏆 </span>}
-                          {i === 1 && <span>🥈 </span>}
-                          {i === 2 && <span>🥉 </span>}
-                          {(item.username || "unknown cowboy").slice(0, 20)}
+                        <td className="break-all text-left">
+                          {(item.username || "unknown cowboy").slice(0, 16)}
                         </td>
                         <td className="text-left">{item.weapon}</td>
                         <td className="text-left">{item.targetTime}</td>
