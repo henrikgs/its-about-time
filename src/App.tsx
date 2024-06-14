@@ -186,6 +186,10 @@ export function App() {
                   Global leaderboard
                 </div>
                 <div>({leaderboard.length} entries)</div>
+                <div>
+                  Yay!🎉 The leaderboard is now up and running again.. Happy
+                  gaming!!
+                </div>
               </div>
 
               <table className="w-full">
