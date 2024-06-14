@@ -5,18 +5,29 @@ import { calculateClicks } from "../utils/scores"
 import { LeaderboardEntry } from "../utils/supabase"
 import { formatElapsedMilliseconds } from "../utils/time"
 
+type LeaderboardType =
+  | "global"
+  | "global-today"
+  | "today-best-only"
+  | "most-played"
+  | "daily-challenge"
+
 export const Leaderboard = ({
   leaderboardEntries,
 }: {
   leaderboardEntries: LeaderboardEntry[]
 }) => {
-  const [selectedType, setSelectedType] = useState<
-    | "global"
-    | "global-today"
-    | "today-best-only"
-    | "most-played"
-    | "daily-challenge"
-  >("today-best-only")
+  const [selectedType, _setSelectedType] = useState<LeaderboardType>(() => {
+    return (
+      (new URLSearchParams(window.location.search).get(
+        "l",
+      ) as LeaderboardType | null) ?? "today-best-only"
+    )
+  })
+  const setSelectedType = (type: LeaderboardType) => {
+    _setSelectedType(type)
+    window.history.replaceState(null, "", `?l=${type}`)
+  }
 
   return (
     <div className="rounded bg-white/[0.4] px-4 py-2">
