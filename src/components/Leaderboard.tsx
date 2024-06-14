@@ -50,6 +50,7 @@ export const Leaderboard = ({
           label="Daily challenge"
           onClick={() => setSelectedType("daily-challenge")}
           selected={selectedType === "daily-challenge"}
+          pride
         />
       </div>
 
@@ -72,18 +73,29 @@ const LeaderboardButton = ({
   label,
   onClick,
   selected,
+  pride,
 }: {
   label: string
   onClick: () => void
   selected: boolean
+  pride?: boolean
 }) => {
   return (
     <button
       onClick={onClick}
       className={cx(
         "rounded bg-white px-3 py-1",
+        pride && "font-bold",
         selected && "bg-gray-800 text-white",
       )}
+      style={
+        pride
+          ? {
+              backgroundImage:
+                "linear-gradient(to right, rgba(237, 34, 36, 0.5), rgba(243, 91, 34, 0.5), rgba(249, 150, 33,0.5 ), rgba(245, 193, 30,0.5 ), rgba(241, 235, 27,0.5 ) 27%, rgba(241, 235, 27,0.5 ), rgba(241, 235, 27,0.5 ) 33%, rgba(99, 199, 32, 0.5), rgba(12, 155, 73, 0.5), rgba(33, 135, 141,0.5 ), rgba(57, 84, 165, 0.5), rgba(97, 55, 155, 0.5), rgba(147, 40, 142,0.5 ))",
+            }
+          : {}
+      }
     >
       {label}
     </button>
