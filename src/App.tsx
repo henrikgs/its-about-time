@@ -9,7 +9,7 @@ import {
   LeaderboardEntry,
   getLeaderboard,
   storeLeaderboardEntry,
-} from "./utils/firebase"
+} from "./utils/supabase"
 import { formatTime, getTimeDate } from "./utils/time"
 
 type LeaderboardItem = Omit<LeaderboardEntry, "username">
