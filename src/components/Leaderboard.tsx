@@ -10,7 +10,7 @@ export const Leaderboard = ({
   leaderboardEntries: LeaderboardEntry[]
 }) => {
   const [selectedType, setSelectedType] = useState<
-    "global" | "global-today" | "today-best-only"
+    "global" | "global-today" | "today-best-only" | "most-played"
   >("global")
 
   return (
@@ -36,6 +36,11 @@ export const Leaderboard = ({
           onClick={() => setSelectedType("today-best-only")}
           selected={selectedType === "today-best-only"}
         />
+        <LeaderboardButton
+          label="Most played"
+          onClick={() => setSelectedType("most-played")}
+          selected={selectedType === "most-played"}
+        />
       </div>
 
       {selectedType === "global" ? (
@@ -44,6 +49,8 @@ export const Leaderboard = ({
         <GlobalToday leaderboardEntries={leaderboardEntries} />
       ) : selectedType === "today-best-only" ? (
         <TodayBestOnly leaderboardEntries={leaderboardEntries} />
+      ) : selectedType === "most-played" ? (
+        <MostPlayedByUsername leaderboardEntries={leaderboardEntries} />
       ) : null}
     </div>
   )
@@ -187,5 +194,77 @@ const isSameDate = (date1: Date, date2: Date) => {
     date1.getDate() === date2.getDate() &&
     date1.getMonth() === date2.getMonth() &&
     date1.getFullYear() === date2.getFullYear()
+  )
+}
+
+const MostPlayedByUsername = ({
+  leaderboardEntries,
+}: {
+  leaderboardEntries: LeaderboardEntry[]
+}) => {
+  const res: {
+    username: string
+    count: number
+    best: LeaderboardEntry
+  }[] = []
+
+  for (const entry of leaderboardEntries) {
+    const index = res.findIndex((item) => item.username === entry.username)
+    if (index === -1) {
+      res.push({ username: entry.username, count: 1, best: entry })
+    } else {
+      res[index].count++
+      if (entry.elapsedMilliseconds < res[index].best.elapsedMilliseconds) {
+        res[index].best = entry
+      }
+    }
+  }
+
+  const entries = res.sort((a, b) => b.count - a.count)
+
+  return (
+    <div>
+      <table className="w-full">
+        <thead>
+          <tr>
+            <th className="w-4 pr-2"></th>
+            <th className="text-left">Name</th>
+            <th className="text-left">Weapon</th>
+            <th className="text-left">Target</th>
+            <th className="text-right">Best score</th>
+            <th className="text-right">Total rounds</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {entries.map((item, i) => {
+            return (
+              <tr key={i}>
+                <td className="w-4 pr-2 text-right text-gray-500">
+                  {i === 0 ? (
+                    <span>🏆</span>
+                  ) : i === 1 ? (
+                    <span>🥈</span>
+                  ) : i === 2 ? (
+                    <span>🥉 </span>
+                  ) : (
+                    <span>{i + 1}.</span>
+                  )}
+                </td>
+                <td className="break-all text-left">
+                  {(item.username || "unknown cowboy").slice(0, 16)}
+                </td>
+                <td className="text-left">{item.best.weapon}</td>
+                <td className="text-left">{item.best.targetTime}</td>
+                <td className="text-right font-mono font-medium">
+                  {formatElapsedMilliseconds(item.best.elapsedMilliseconds)}
+                </td>
+                <td className="text-right">{item.count}</td>
+              </tr>
+            )
+          })}
+        </tbody>
+      </table>
+    </div>
   )
 }
