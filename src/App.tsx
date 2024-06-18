@@ -92,6 +92,10 @@ export function App() {
                 Your mission, should you choose to accept it, is to find the
                 best time picker.
               </div>
+              <div className="text-center italic">
+                (Using the keyboard on desktop is obviously is the fastest
+                method, so only touch/mouse is allowed :)
+              </div>
               <div>
                 <div>What's your name, cowboy?</div>
                 <input
